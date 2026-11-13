@@ -61,6 +61,11 @@ def _boot_args(p: argparse.ArgumentParser) -> None:
 
 
 def _setup(args: argparse.Namespace) -> tuple[Tokenizer, Options]:
+    if args.limit is not None and args.limit < 0:
+        raise ValueError("--limit must be 0 or more")
+    for t in getattr(args, "full", None) or ():
+        if not 0.0 < t <= 1.0:
+            raise ValueError(f"--full thresholds must be in (0, 1], got {t:g}")
     tok = Tokenizer(args.tokenizer, lower=not args.keep_case)
     opt = Options(
         span_k=args.span_k, min_span=args.min_span, lead=args.lead, algorithm=args.algorithm

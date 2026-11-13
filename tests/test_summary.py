@@ -173,3 +173,13 @@ def test_empty_tail_has_nonzero_upper_bound():
     empty = summarize(_scores(["a b c d"]), boot=BootstrapSettings(n_boot=50))
     zero = empty["tails"]["no_token_copied"]
     assert zero["count"] == 0 and zero["ci"][1] > 0.5
+
+
+@pytest.mark.parametrize(
+    "extra, message",
+    [(["--limit", "-1"], "--limit"), (["--full", "2"], "--full"), (["--full", "0"], "--full")],
+)
+def test_cli_rejects_bad_limit_and_threshold(data, capsys, extra, message):
+    p, _ = data
+    assert main(["summary", str(p), "--source", "src", "--output", "out"] + extra) == 2
+    assert message in capsys.readouterr().err
