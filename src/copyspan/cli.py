@@ -10,7 +10,13 @@ from collections.abc import Sequence
 from copyspan import __version__
 from copyspan.io import Record, read_records
 from copyspan.metrics import ALGORITHMS, Options, RecordScore, score_tokens
-from copyspan.report import compare_markdown, flags_markdown, summary_markdown
+from copyspan.report import (
+    MIN_GROUPS,
+    compare_markdown,
+    few_groups_warning,
+    flags_markdown,
+    summary_markdown,
+)
 from copyspan.summary import BootstrapSettings, compare, summarize
 from copyspan.tokenize import MODES, Tokenizer
 
@@ -94,6 +100,11 @@ def _groups(records: Sequence[Record]) -> list[str] | None:
     return None
 
 
+def _warn_groups(groups: Sequence[str] | None) -> None:
+    if groups is not None and len(set(groups)) < MIN_GROUPS:
+        print(f"copyspan: {few_groups_warning(len(set(groups)))}", file=sys.stderr)
+
+
 def _boot(args: argparse.Namespace) -> BootstrapSettings:
     return BootstrapSettings(n_boot=args.boot, level=args.level, seed=args.seed)
 
@@ -155,6 +166,7 @@ def cmd_summary(args: argparse.Namespace) -> int:
     records = _load(args)
     scores = _score_all(records, tok, opt)
     groups = _groups(records)
+    _warn_groups(groups)
     meta = summarize(scores, groups, opt, tuple(args.full or (0.9, 1.0)), _boot(args))
     meta["tokenizer"] = tok.describe()
     meta["group_field"] = args.group_field
@@ -194,6 +206,7 @@ def cmd_compare(args: argparse.Namespace) -> int:
         }
         label_a, label_b = f"{args.path}:{args.output}", f"{args.other_file}:{field_b}"
     sa, sb = _score_all(rec_a, tok, opt), _score_all(rec_b, tok, opt)
+    _warn_groups(_groups(rec_a))
     meta = compare(sa, sb, _groups(rec_a), tuple(args.full or (0.9, 1.0)), _boot(args))
     meta.update(
         {

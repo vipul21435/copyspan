@@ -97,6 +97,7 @@ def test_cli_summary_md_and_json(data, capsys):
     assert main(args + ["--group", "g", "--full", "0.5"]) == 0
     md = capsys.readouterr().out
     assert "clustered by `g` (2 groups)" in md
+    assert "Warning: only 2 groups" in md
     assert "coverage >= 0.5" in md
     assert "Where copies come from" in md
     assert "Fragments: exact search." in md
@@ -183,3 +184,13 @@ def test_cli_rejects_bad_limit_and_threshold(data, capsys, extra, message):
     p, _ = data
     assert main(["summary", str(p), "--source", "src", "--output", "out"] + extra) == 2
     assert message in capsys.readouterr().err
+
+
+def test_cli_warns_on_few_groups(data, capsys):
+    p, _ = data
+    args = ["compare", str(p), "--source", "src", "--output", "out", "--other", "alt"]
+    assert main(args + ["--group", "g", "--boot", "20"]) == 0
+    captured = capsys.readouterr()
+    assert "only 2 groups" in captured.err and "only 2 groups" in captured.out
+    assert main(args + ["--boot", "20"]) == 0
+    assert "groups" not in capsys.readouterr().err

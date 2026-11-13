@@ -20,6 +20,16 @@ LABELS = {
 }
 
 
+MIN_GROUPS = 20
+
+
+def few_groups_warning(n_groups: int) -> str:
+    return (
+        f"Warning: only {n_groups} groups; clustered bootstrap intervals are too narrow with fewer "
+        f"than {MIN_GROUPS} groups."
+    )
+
+
 def _f(v: object, digits: int = 3) -> str:
     if v is None:
         return "-"
@@ -56,6 +66,8 @@ def _header(meta: dict) -> list[str]:
             f"Intervals: {level} percentile bootstrap, {o['n_boot']} resamples, seed {o['seed']}, "
             f"clustered by `{meta['group_field']}` ({meta['groups']} groups)."
         )
+        if meta["groups"] is not None and meta["groups"] < MIN_GROUPS:
+            lines.append(few_groups_warning(meta["groups"]))
     else:
         lines.append(
             f"Intervals: {level} percentile bootstrap over records, {o['n_boot']} resamples, "

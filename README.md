@@ -263,8 +263,8 @@ time (about 9 s of CPU) while the laptop's load average was near 30.
 - Novel n-gram shares are means of per-record shares; a share pooled over all n-grams of a dataset is not reported.
 - Position and order measures ignore fragments shorter than `--min-span`, so outputs with only short copies have no
   value for them (only 862 of the 2,000 XSum records have a fragment of 3 or more tokens).
-- Clustered intervals with few groups (for example the three Dolly categories) are not trustworthy, and the code
-  does not warn about it.
+- Clustered intervals with few groups (for example the three Dolly categories) are too narrow; `summary` and
+  `compare` print a warning below 20 groups.
 - A whole input file is read into memory; there is no streaming.
 - Only the greedy fragment definition is implemented; there are no alignment-based or semantic measures.
 
