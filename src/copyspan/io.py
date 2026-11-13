@@ -56,7 +56,7 @@ def _text(value: object) -> str:
 
 def read_records(
     path: str | Path,
-    source_field: str,
+    source_field: str | None,
     output_field: str,
     id_field: str | None = None,
     group_field: str | None = None,
@@ -64,12 +64,13 @@ def read_records(
     """Load records. Rows missing the source or output field raise ``ValueError``.
 
     A list value (for example a list of sentences) is joined with newlines.
-    Without ``id_field`` the id is the 0-based row number.
+    Without ``id_field`` the id is the 0-based row number. With ``source_field``
+    set to ``None`` only the output is read (the source is left empty).
     """
     out: list[Record] = []
     for k, row in enumerate(_rows(path)):
         for f in (source_field, output_field):
-            if f not in row:
+            if f is not None and f not in row:
                 raise ValueError(f"row {k}: field {f!r} not found (fields: {sorted(row)})")
         rid = str(row[id_field]) if id_field and row.get(id_field) is not None else str(k)
         grp = None
@@ -77,5 +78,6 @@ def read_records(
             if row.get(group_field) is None:
                 raise ValueError(f"row {k}: group field {group_field!r} missing")
             grp = str(row[group_field])
-        out.append(Record(rid, _text(row[source_field]), _text(row[output_field]), grp))
+        src = _text(row[source_field]) if source_field is not None else ""
+        out.append(Record(rid, src, _text(row[output_field]), grp))
     return out
