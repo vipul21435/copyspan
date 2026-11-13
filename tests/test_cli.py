@@ -110,3 +110,25 @@ def test_tsv_and_group_missing(tmp_path):
     q.write_text(json.dumps({"src": "a", "out": "a"}) + "\n")
     with pytest.raises(ValueError, match="group field"):
         read_records(q, "src", "out", group_field="g")
+
+
+def test_missing_id_field_raises(tmp_path, capsys):
+    a = tmp_path / "a.jsonl"
+    a.write_text('{"id": "a", "s": "x y", "o": "x"}\n{"id": "b", "s": "p q", "o": "z"}\n')
+    b = tmp_path / "b.jsonl"
+    b.write_text('{"id": "b", "o": "z"}\n{"id": "a", "o": "x"}\n')
+    base = ["compare", str(a), "--source", "s", "--output", "o", "--other-file", str(b)]
+    assert main(base + ["--id", "idd"]) == 2
+    assert "id field 'idd' missing" in capsys.readouterr().err
+    assert main(base + ["--id", "id", "--format", "json"]) == 0
+    doc = json.loads(capsys.readouterr().out)
+    assert doc["metrics"]["coverage"]["diff"] == pytest.approx(0.0)
+
+
+def test_csv_with_byte_order_mark(tmp_path):
+    p = tmp_path / "bom.csv"
+    p.write_bytes("\ufeffid,src,out\nk1,a b,a\n".encode())
+    assert read_records(p, "src", "out", "id")[0].id == "k1"
+    q = tmp_path / "bom.jsonl"
+    q.write_bytes('\ufeff{"id": "k2", "src": "a", "out": "a"}\n'.encode())
+    assert read_records(q, "src", "out", "id")[0].id == "k2"
