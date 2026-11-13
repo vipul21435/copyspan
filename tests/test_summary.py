@@ -141,3 +141,24 @@ def test_cli_flag(data, capsys):
     assert main(base + ["--only", "slice", "--limit", "1"]) == 0
     assert "(none)" in capsys.readouterr().out
     assert main(base + ["--only", "bogus"]) == 2
+
+
+def test_cli_compare_rejects_duplicate_ids(tmp_path, capsys):
+    p = tmp_path / "a.jsonl"
+    p.write_text('{"id": 1, "s": "a b", "o": "a"}\n{"id": 1, "s": "c", "o": "c"}\n')
+    q = tmp_path / "b.jsonl"
+    q.write_text('{"id": 1, "o": "b"}\n')
+    args = [
+        "compare",
+        str(p),
+        "--source",
+        "s",
+        "--output",
+        "o",
+        "--id",
+        "id",
+        "--other-file",
+        str(q),
+    ]
+    assert main(args) == 2
+    assert "ids must be unique" in capsys.readouterr().err
