@@ -180,7 +180,7 @@ Data:
 
 - CNN / Daily Mail 3.0.0, test split (11,490 pairs; the highlights are the output), from
   https://huggingface.co/datasets/abisee/cnn_dailymail. The card states: "The CNN / Daily Mail dataset version
-  1.0.0 is released under the Apache-2.0 License" (the card says nothing separate for 3.0.0). Sample: 2,000 pairs drawn with `random.Random(0).sample`.
+  1.0.0 is released under the Apache-2.0 License"; the files used here are its version 3.0.0. Sample: 2,000 pairs drawn with `random.Random(0).sample`.
 - XSum, test split (11,334 pairs), from https://huggingface.co/datasets/EdinburghNLP/xsum. The card lists the
   licence as "unknown", so only derived numbers and ids are given here. Sample: 2,000 pairs, seed 0.
 - databricks-dolly-15k, from https://huggingface.co/datasets/databricks/databricks-dolly-15k (CC BY-SA 3.0 as
