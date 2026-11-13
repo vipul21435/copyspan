@@ -123,9 +123,12 @@ vocabularies, where repeats and ties are common.
 **The published procedure.** The paper's Figure 3 moves the source index past a match (`j ← j′`) before looking for
 the next one, so a longer match that starts inside an earlier, shorter one can be missed (source `a a a b`, output
 `a a b`: the exact search finds one fragment of 3, the figure's procedure 2 + 1). The figure also prints the update
-test as `|f| < (i′ − i − 1)`, which taken literally never keeps a one-token match; copyspan reads it as
-`|f| < (i′ − i)`, the match length, which is what the paper's text describes. `--algorithm newsroom` uses this
-procedure. On the three real samples below the two gave identical fragments for every record.
+test as `|f| < (i′ − i − 1)`, which taken literally never keeps a one-token match and never replaces a kept match
+by one exactly one token longer; copyspan reads it as `|f| < (i′ − i)`, the match length, which is what the paper's
+text describes. The authors' released code
+([lil-lab/newsroom, `newsroom/analyze/fragments.py`](https://github.com/lil-lab/newsroom/blob/master/newsroom/analyze/fragments.py))
+does the same: it keeps a match when `length > best_match_length` and moves on with `b_start = b_end`.
+`--algorithm newsroom` uses this procedure. On the three real samples below the two gave identical fragments for every record.
 
 **Novel n-grams** (See, Liu and Manning 2017; Narayan, Cohen and Lapata 2018). For n = 1 to 4, the share of the
 output's n-grams, counted with repetition, that do not occur anywhere in the source; undefined (left out of means)

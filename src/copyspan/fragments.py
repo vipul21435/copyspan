@@ -15,9 +15,11 @@ Three implementations are given:
   jumps past a match in the source (``j <- j'``), so a longer match that starts
   inside an earlier, shorter one can be missed. The figure prints the update
   test as ``|f| < (i' - i - 1)``, which taken literally never keeps a one-token
-  match; here it is read as ``|f| < (i' - i)``, the match length, which is what
-  the text describes ("we prefer to mark the longest prefix possible"). It
-  exists for comparison.
+  match and never replaces a kept match by one exactly one token longer; here it
+  is read as ``|f| < (i' - i)``, the match length, which is what the text
+  describes ("we prefer to mark the longest prefix possible") and what the
+  authors' released code (lil-lab/newsroom, newsroom/analyze/fragments.py) does.
+  It exists for comparison.
 
 Ties between equally long matches go to the leftmost source position in all
 three.
