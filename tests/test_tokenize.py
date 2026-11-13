@@ -29,3 +29,13 @@ def test_describe_names_mode_and_case():
     assert "case folded" in Tokenizer("word", True).describe()
     assert "whitespace" in Tokenizer("whitespace", False).describe()
     assert "case kept" in Tokenizer("whitespace", False).describe()
+
+
+def test_public_api_round_trip():
+    import copyspan
+
+    tok = copyspan.Tokenizer()
+    r = copyspan.score_tokens(tok("The cat sat."), tok("The cat."), copyspan.Options())
+    s = copyspan.summarize([r], boot=copyspan.BootstrapSettings(n_boot=10))
+    assert s["metrics"]["coverage"]["mean"] == 1.0
+    assert copyspan.__version__ == "0.1.0"
