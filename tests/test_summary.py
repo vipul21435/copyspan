@@ -99,6 +99,9 @@ def test_cli_summary_md_and_json(data, capsys):
     assert "clustered by `g` (2 groups)" in md
     assert "coverage >= 0.5" in md
     assert "Where copies come from" in md
+    assert "Fragments: exact search." in md
+    assert main(args + ["--algorithm", "newsroom"]) == 0
+    assert "Fragments: newsroom search." in capsys.readouterr().out
     assert main(args + ["--format", "json", "--limit", "2"]) == 0
     doc = json.loads(capsys.readouterr().out)
     assert doc["records"] == 2 and doc["tokenizer"].startswith("word")

@@ -10,8 +10,13 @@ from copyspan.io import read_records
 def jsonl(tmp_path):
     p = tmp_path / "d.jsonl"
     rows = [
-        {"id": "a", "g": "x", "src": "one two three four five", "out": "one two three",
-         "alt": "six"},
+        {
+            "id": "a",
+            "g": "x",
+            "src": "one two three four five",
+            "out": "one two three",
+            "alt": "six",
+        },
         {"id": "b", "g": "x", "src": "red green blue", "out": "green blue red", "alt": "red"},
         {"id": "c", "g": "y", "src": "alpha beta", "out": "", "alt": "alpha beta"},
     ]
@@ -33,8 +38,24 @@ def test_score_md_and_json(jsonl, capsys):
     out = capsys.readouterr().out
     assert out.startswith("Tokeniser: word regex")
     assert "| 0 | 5 | 3 | 1.000 |" in out
-    main(["score", str(jsonl), "--source", "src", "--output", "out", "--format", "json",
-          "--spans", "--group", "g", "--tokenizer", "whitespace", "--keep-case"])
+    main(
+        [
+            "score",
+            str(jsonl),
+            "--source",
+            "src",
+            "--output",
+            "out",
+            "--format",
+            "json",
+            "--spans",
+            "--group",
+            "g",
+            "--tokenizer",
+            "whitespace",
+            "--keep-case",
+        ]
+    )
     doc = json.loads(capsys.readouterr().out)
     assert doc["tokenizer"].startswith("whitespace")
     assert doc["records"][0]["group"] == "x"

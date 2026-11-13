@@ -48,6 +48,7 @@ def _header(meta: dict) -> list[str]:
         f"Tokeniser: {meta['tokenizer']}.",
         f"Long spans: at least {o['span_k']} tokens; position and order use fragments of at least "
         f"{o['min_span']} tokens; lead = first {100 * o['lead']:g} % of the source.",
+        f"Fragments: {o.get('algorithm', 'exact')} search.",
     ]
     level = f"{100 * o['level']:g} %"
     if meta.get("group_field"):

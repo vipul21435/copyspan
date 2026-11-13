@@ -5,10 +5,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
-from copyspan.fragments import Fragment, fragments, longest_matches
+from copyspan.fragments import Fragment, fragments, fragments_newsroom, longest_matches
 from copyspan.stopwords import STOPWORDS
 
 NGRAM_ORDERS = (1, 2, 3, 4)
+ALGORITHMS = ("exact", "newsroom")
 
 
 @dataclass(frozen=True)
@@ -20,17 +21,22 @@ class Options:
     min_span: fragments shorter than this are ignored for the position and
         order measures (single shared words are mostly function words).
     lead: the leading share of the source used for the lead measure.
+    algorithm: "exact" (longest match at each output position) or "newsroom"
+        (the published procedure with its source-index jump).
     """
 
     span_k: int = 3
     min_span: int = 3
     lead: float = 0.25
+    algorithm: str = "exact"
 
     def __post_init__(self) -> None:
         if self.span_k < 1 or self.min_span < 1:
             raise ValueError("span_k and min_span must be at least 1")
         if not 0.0 < self.lead <= 1.0:
             raise ValueError("lead must be in (0, 1]")
+        if self.algorithm not in ALGORITHMS:
+            raise ValueError(f"algorithm must be one of {ALGORITHMS}")
 
 
 @dataclass
@@ -107,7 +113,8 @@ def score_tokens(
     opt = options or Options()
     n_src, n_out = len(source), len(output)
     lengths, starts = longest_matches(source, output)
-    frags = fragments(source, output) if n_out and n_src else []
+    finder = fragments if opt.algorithm == "exact" else fragments_newsroom
+    frags = finder(source, output) if n_out and n_src else []
     copied = sum(f.length for f in frags)
 
     if n_out:

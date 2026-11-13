@@ -88,7 +88,18 @@ def test_novel_share_short_output():
     assert novel_ngram_share(["a"], ["a"], 2) is None
 
 
+def test_newsroom_algorithm_option():
+    source = toks("a a a b")
+    output = toks("a a b")
+    assert score_tokens(source, output).density == pytest.approx(3.0)
+    r = score_tokens(source, output, Options(algorithm="newsroom"))
+    assert r.density == pytest.approx((4 + 1) / 3)
+    assert r.coverage == pytest.approx(1.0)
+
+
 def test_options_validation():
+    with pytest.raises(ValueError):
+        Options(algorithm="fast")
     with pytest.raises(ValueError):
         Options(span_k=0)
     with pytest.raises(ValueError):

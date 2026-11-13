@@ -143,6 +143,7 @@ def summarize(
             "span_k": opt.span_k,
             "min_span": opt.min_span,
             "lead": opt.lead,
+            "algorithm": opt.algorithm,
             "n_boot": bs.n_boot,
             "level": bs.level,
             "seed": bs.seed,

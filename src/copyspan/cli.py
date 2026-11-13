@@ -9,7 +9,7 @@ from collections.abc import Sequence
 
 from copyspan import __version__
 from copyspan.io import Record, read_records
-from copyspan.metrics import Options, RecordScore, score_tokens
+from copyspan.metrics import ALGORITHMS, Options, RecordScore, score_tokens
 from copyspan.report import compare_markdown, flags_markdown, summary_markdown
 from copyspan.summary import BootstrapSettings, compare, summarize
 from copyspan.tokenize import MODES, Tokenizer
@@ -38,6 +38,12 @@ def _common(p: argparse.ArgumentParser) -> None:
         default=0.25,
         help="leading share of the source for the lead measure (0.25)",
     )
+    p.add_argument(
+        "--algorithm",
+        choices=ALGORITHMS,
+        default="exact",
+        help="fragment search: exact longest match (default) or the published newsroom procedure",
+    )
     p.add_argument("--limit", type=int, help="use only the first N records")
 
 
@@ -56,7 +62,9 @@ def _boot_args(p: argparse.ArgumentParser) -> None:
 
 def _setup(args: argparse.Namespace) -> tuple[Tokenizer, Options]:
     tok = Tokenizer(args.tokenizer, lower=not args.keep_case)
-    opt = Options(span_k=args.span_k, min_span=args.min_span, lead=args.lead)
+    opt = Options(
+        span_k=args.span_k, min_span=args.min_span, lead=args.lead, algorithm=args.algorithm
+    )
     return tok, opt
 
 
@@ -194,6 +202,7 @@ def cmd_compare(args: argparse.Namespace) -> int:
                 "span_k": opt.span_k,
                 "min_span": opt.min_span,
                 "lead": opt.lead,
+                "algorithm": opt.algorithm,
                 "n_boot": args.boot,
                 "level": args.level,
                 "seed": args.seed,
