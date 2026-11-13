@@ -221,8 +221,9 @@ Mail takes 29.8 % from the first tenth and 21.8 % from the second, falling to 3.
 the gold summaries of the test sets: CNN 16.75, 54.33, 72.42, 80.37 %; DailyMail 17.03, 53.78, 72.14, 80.28 %; XSum
 35.76, 83.45, 95.50, 98.49 % (unigrams to 4-grams). The XSum sample above is within 1.1 points at every order. For
 CNN / Daily Mail the word tokeniser gives lower shares (48.9 % novel bigrams), because punctuation marks become
-tokens and are mostly copied; with `--tokenizer whitespace` the same sample gives 16.2, 56.8, 75.1 and 83.7 %, so
-the published figures fall between the two. Their preprocessing was not reproduced and the CNN and DailyMail halves
+tokens and are mostly copied; with `--tokenizer whitespace` the same sample gives 16.2, 56.8, 75.1 and 83.7 %. For
+bigrams to 4-grams the published figures fall between the two tokenisers; the published unigram shares (16.75 and
+17.03 %) sit 0.6 and 0.8 points above the whitespace figure. Their preprocessing was not reproduced and the CNN and DailyMail halves
 are not separated here, so a gap is expected. Grusky et al. (2018) show coverage and density for CNN / Daily Mail
 only as a plot; their Figure 4 gives its median compression as 14:1, against 12.3 (word tokens) and 11.6
 (whitespace tokens) on this test sample.
