@@ -31,6 +31,7 @@ def test_score_jsonl(jsonl, capsys):
     assert lines[0]["coverage"] == 1.0
     assert "prefix" in lines[0]["flags"]
     assert lines[2]["flags"] == ["empty_output"]
+    assert lines[0]["tokenizer"].startswith("word regex")
 
 
 def test_score_md_and_json(jsonl, capsys):

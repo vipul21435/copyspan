@@ -121,7 +121,7 @@ def cmd_score(args: argparse.Namespace) -> int:
     out = sys.stdout
     if args.format == "jsonl":
         for d in rows:
-            out.write(json.dumps(d) + "\n")
+            out.write(json.dumps({**d, "tokenizer": tok.describe()}) + "\n")
     elif args.format == "json":
         _write_json({"tokenizer": tok.describe(), "records": rows})
     else:
@@ -241,7 +241,7 @@ def cmd_flag(args: argparse.Namespace) -> int:
         _write_json({"tokenizer": tok.describe(), "records": len(records), "flagged": rows})
     elif args.format == "jsonl":
         for r in rows:
-            sys.stdout.write(json.dumps(r) + "\n")
+            sys.stdout.write(json.dumps({**r, "tokenizer": tok.describe()}) + "\n")
     else:
         sys.stdout.write(flags_markdown(rows, tok.describe()))
     return 0

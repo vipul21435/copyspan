@@ -47,7 +47,7 @@ Tokeniser: word regex (words and single punctuation marks), case folded.
 | r6 | 12 | 2 | 0.500 | 0.500 | 6.000 | 1.000 | 1 | no_shared_content |
 ```
 
-The default `--format jsonl` writes every measure per record; `--spans` adds the copied spans as
+The default `--format jsonl` writes every measure and the tokeniser per record; `--spans` adds the copied spans as
 `{out_start, src_start, length}` token offsets.
 
 ```
