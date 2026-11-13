@@ -198,6 +198,10 @@ Means with 95 % bootstrap intervals, word tokeniser, case folded:
 | XSum | 2,000 | 0.653 [0.646, 0.659] | 1.05 [1.03, 1.08] | 14.5 | 34.7 % | 83.7 % [83.2, 84.2] | 95.6 % | 98.4 % |
 | Dolly (with context) | 4,467 | 0.830 [0.825, 0.836] | 12.16 [11.13, 13.20] | 5.8 | 17.0 % | 46.2 % [45.2, 47.1] | 59.9 % | 66.9 % |
 
+Novel n-gram shares are left undefined for outputs shorter than n tokens, so the Dolly bigram, trigram and 4-gram
+means are over 4,357, 4,284 and 4,225 of its 4,467 records; every other cell in the table uses all records of its
+set.
+
 The tails, as shares of records with a non-empty output:
 
 | set | coverage ≥ 0.9 | coverage = 1 | whole output one source span | no token copied | no shared content word |
