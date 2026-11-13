@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from statistics import NormalDist
 
 import numpy as np
 
@@ -89,3 +90,19 @@ def paired_difference(
         raise ValueError("paired samples differ in length")
     diff = np.asarray(a, dtype=float) - np.asarray(b, dtype=float)
     return bootstrap_mean(diff, groups, n_boot=n_boot, level=level, seed=seed)
+
+
+def wilson_interval(successes: int, n: int, level: float = 0.95) -> Interval | None:
+    """Wilson score interval for a binomial share (Wilson 1927). ``None`` when n is 0."""
+    if n == 0:
+        return None
+    if not 0 <= successes <= n:
+        raise ValueError("successes must lie in [0, n]")
+    if not 0.0 < level < 1.0:
+        raise ValueError("level must be in (0, 1)")
+    z = NormalDist().inv_cdf(0.5 + level / 2.0)
+    p = successes / n
+    denom = 1.0 + z * z / n
+    centre = (p + z * z / (2 * n)) / denom
+    half = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
+    return Interval(p, float(max(0.0, centre - half)), float(min(1.0, centre + half)))

@@ -162,3 +162,14 @@ def test_cli_compare_rejects_duplicate_ids(tmp_path, capsys):
     ]
     assert main(args) == 2
     assert "ids must be unique" in capsys.readouterr().err
+
+
+def test_empty_tail_has_nonzero_upper_bound():
+    s = summarize(_scores(), boot=BootstrapSettings(n_boot=50))
+    nothing = s["tails"]["no_shared_content_word"]
+    assert nothing["count"] == 2
+    t = s["tails"]["fully_copied"][0]["long_span_share"]
+    assert t["ci"][0] <= t["share"] <= t["ci"][1]
+    empty = summarize(_scores(["a b c d"]), boot=BootstrapSettings(n_boot=50))
+    zero = empty["tails"]["no_token_copied"]
+    assert zero["count"] == 0 and zero["ci"][1] > 0.5

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from copyspan.stats import bootstrap_mean, paired_difference, quantiles
+from copyspan.stats import bootstrap_mean, paired_difference, quantiles, wilson_interval
 
 
 def test_quantiles_hand_values():
@@ -79,3 +79,21 @@ def test_errors_and_empty():
         bootstrap_mean([1.0], n_boot=0)
     with pytest.raises(ValueError):
         paired_difference([1.0], [1.0, 2.0])
+
+
+def test_wilson_interval_closed_forms():
+    z2 = 1.959963984540054**2
+    iv = wilson_interval(0, 2000)
+    assert iv.estimate == pytest.approx(0.0)
+    assert iv.low == pytest.approx(0.0, abs=1e-12)
+    # with no successes the upper end is z^2 / (n + z^2)
+    assert iv.high == pytest.approx(z2 / (2000 + z2))
+    iv = wilson_interval(5, 10)
+    assert iv.low + iv.high == pytest.approx(1.0)
+    iv = wilson_interval(10, 10)
+    assert iv.high == pytest.approx(1.0) and iv.low == pytest.approx(10 / (10 + z2))
+    assert wilson_interval(0, 0) is None
+    with pytest.raises(ValueError):
+        wilson_interval(3, 2)
+    with pytest.raises(ValueError):
+        wilson_interval(1, 2, level=0)

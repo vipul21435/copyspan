@@ -158,11 +158,13 @@ With `--group`, whole groups are resampled and the mean is the ratio of resample
 records of one group (several outputs for one source document, one category) move together; with few groups the
 interval is itself unreliable. Tails: coverage at least each `--full` threshold (default 0.9 and 1.0), the same for
 the long-span share, whole output is one source span, no token copied (coverage 0) and no shared content word, each
-with its count, share and interval.
+with its count, share and interval: the Wilson score interval without groups, which stays informative when a tail is
+rare or empty, and the clustered bootstrap with groups.
 
 **Comparison.** For two outputs of the same sources (two fields of one file, or two files joined by `--id`, with
 the source always taken from the first), the mean of each output and the paired difference a − b with a paired
-bootstrap interval (records, or groups, resampled together for both outputs), and the same for each tail.
+bootstrap interval (records, or groups, resampled together for both outputs), and the same for each tail. A
+percentile bootstrap gives [0, 0] for a tail that no record of either output reaches, so read those rows as counts.
 
 ## Results on real public data
 

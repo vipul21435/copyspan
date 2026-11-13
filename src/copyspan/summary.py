@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from copyspan.metrics import NGRAM_ORDERS, Options, RecordScore
-from copyspan.stats import bootstrap_mean, paired_difference, quantiles
+from copyspan.stats import bootstrap_mean, paired_difference, quantiles, wilson_interval
 
 METRICS = (
     "coverage",
@@ -55,9 +55,14 @@ def _defined(
 
 
 def _share(hits: Sequence[bool], groups: Sequence[str] | None, boot: BootstrapSettings) -> dict:
-    iv = bootstrap_mean(
-        [1.0 if h else 0.0 for h in hits], groups, boot.n_boot, boot.level, boot.seed
-    )
+    """Count and share of hits. The interval is Wilson's without groups (it stays
+    informative when a tail is empty or rare) and the clustered bootstrap with groups."""
+    if groups is None:
+        iv = wilson_interval(int(sum(hits)), len(hits), boot.level)
+    else:
+        iv = bootstrap_mean(
+            [1.0 if h else 0.0 for h in hits], groups, boot.n_boot, boot.level, boot.seed
+        )
     return {
         "count": int(sum(hits)),
         "share": None if iv is None else iv.estimate,
