@@ -87,3 +87,25 @@ def test_list_values_are_joined(tmp_path):
     p.write_text(json.dumps({"s": ["a b", "c"], "o": None}) + "\n")
     rec = read_records(p, "s", "o")[0]
     assert rec.source == "a b\nc" and rec.output == ""
+
+
+def test_stdin_input(monkeypatch, capsys):
+    import io as _io
+
+    monkeypatch.setattr("sys.stdin", _io.StringIO('{"s": "a b c", "o": "a b"}\n\n[1, 2]\n'))
+    assert main(["score", "-", "--source", "s", "--output", "o"]) == 2
+    assert "<stdin>:3: expected a JSON object" in capsys.readouterr().err
+    monkeypatch.setattr("sys.stdin", _io.StringIO('{"s": "a b c", "o": "a b"}\n'))
+    assert main(["score", "-", "--source", "s", "--output", "o"]) == 0
+    assert json.loads(capsys.readouterr().out)["coverage"] == 1.0
+
+
+def test_tsv_and_group_missing(tmp_path):
+    p = tmp_path / "d.tsv"
+    p.write_text("src\tout\tg\na b\ta\tx\nc d\tc\t\n")
+    recs = read_records(p, "src", "out")
+    assert [r.output for r in recs] == ["a", "c"]
+    q = tmp_path / "g.jsonl"
+    q.write_text(json.dumps({"src": "a", "out": "a"}) + "\n")
+    with pytest.raises(ValueError, match="group field"):
+        read_records(q, "src", "out", group_field="g")

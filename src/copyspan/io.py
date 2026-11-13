@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import sys
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,12 +18,23 @@ class Record:
     group: str | None = None
 
 
+def _json_lines(lines: Iterable[str], name: str) -> Iterator[dict]:
+    for lineno, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"{name}:{lineno}: not valid JSON ({exc.msg})") from exc
+        if not isinstance(row, dict):
+            raise ValueError(f"{name}:{lineno}: expected a JSON object")
+        yield row
+
+
 def _rows(path: str | Path) -> Iterator[dict]:
     p = str(path)
     if p == "-":
-        for line in sys.stdin:
-            if line.strip():
-                yield json.loads(line)
+        yield from _json_lines(sys.stdin, "<stdin>")
         return
     if p.endswith(".csv") or p.endswith(".tsv"):
         delim = "\t" if p.endswith(".tsv") else ","
@@ -32,16 +43,7 @@ def _rows(path: str | Path) -> Iterator[dict]:
             yield from csv.DictReader(fh, delimiter=delim)
         return
     with open(p, encoding="utf-8") as fh:
-        for lineno, line in enumerate(fh, 1):
-            if not line.strip():
-                continue
-            try:
-                row = json.loads(line)
-            except json.JSONDecodeError as exc:
-                raise ValueError(f"{p}:{lineno}: not valid JSON ({exc.msg})") from exc
-            if not isinstance(row, dict):
-                raise ValueError(f"{p}:{lineno}: expected a JSON object")
-            yield row
+        yield from _json_lines(fh, p)
 
 
 def _text(value: object) -> str:
