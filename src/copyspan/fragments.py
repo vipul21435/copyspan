@@ -11,9 +11,13 @@ Three implementations are given:
   linear time with a suffix automaton of the reversed source.
 * ``fragments_bruteforce``: the same definition by direct search, quadratic in
   the lengths; used as the reference in tests.
-* ``fragments_newsroom``: the pseudocode of the paper as printed. Its inner loop
+* ``fragments_newsroom``: the procedure of the paper's Figure 3. Its inner loop
   jumps past a match in the source (``j <- j'``), so a longer match that starts
-  inside an earlier, shorter one can be missed. It exists for comparison.
+  inside an earlier, shorter one can be missed. The figure prints the update
+  test as ``|f| < (i' - i - 1)``, which taken literally never keeps a one-token
+  match; here it is read as ``|f| < (i' - i)``, the match length, which is what
+  the text describes ("we prefer to mark the longest prefix possible"). It
+  exists for comparison.
 
 Ties between equally long matches go to the leftmost source position in all
 three.
@@ -176,7 +180,7 @@ def fragments_bruteforce(source: Sequence[str], output: Sequence[str]) -> list[F
 
 
 def fragments_newsroom(source: Sequence[str], output: Sequence[str]) -> list[Fragment]:
-    """The greedy procedure exactly as printed in Grusky et al. (2018), Algorithm 1.
+    """The greedy procedure of Grusky et al. (2018), Figure 3, with its source-index jump.
 
     After a match the source index jumps to the end of that match, so the
     result can contain shorter fragments than :func:`fragments`.
