@@ -228,8 +228,8 @@ tokens and are mostly copied; with `--tokenizer whitespace` the same sample give
 bigrams to 4-grams the published figures fall between the two tokenisers; the published unigram shares (16.75 and
 17.03 %) sit 0.6 and 0.8 points above the whitespace figure. Their preprocessing was not reproduced and the CNN and DailyMail halves
 are not separated here, so a gap is expected. Grusky et al. (2018) show coverage and density for CNN / Daily Mail
-only as a plot; their Figure 4 gives its median compression as 14:1, against 12.3 (word tokens) and 11.6
-(whitespace tokens) on this test sample.
+only as a plot; their Figure 4 gives its median compression as 14:1 for the training set (n = 287,227), against
+12.3 (word tokens) and 11.6 (whitespace tokens) on this test-set sample.
 
 **Comparison.** The lead-3 baseline (the first three sentences of each article, split with a simple regular
 expression in `prepare_data.py`) against the reference highlights on the same 2,000 CNN / Daily Mail sources:
