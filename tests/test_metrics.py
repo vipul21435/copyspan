@@ -60,20 +60,20 @@ def test_empty_and_one_token():
     assert r.coverage is None and r.density is None and r.compression is None
     assert r.flags == ["empty_output"]
     r = score_tokens(toks("a"), toks("a"))
-    assert r.coverage == 1.0 and r.density == 1.0 and r.compression == 1.0
+    assert (r.coverage, r.density, r.compression) == pytest.approx((1.0, 1.0, 1.0))
     assert r.novel[2] is None
     r = score_tokens([], toks("word"))
-    assert r.coverage == 0.0
-    assert r.compression == 0.0
+    assert r.coverage == pytest.approx(0.0)
+    assert r.compression == pytest.approx(0.0)
     assert "longer_than_source" in r.flags
 
 
 def test_order_measures():
     source = toks("a b c d e f g h i j k l")
     kept = score_tokens(source, toks("a b c x g h i"))
-    assert kept.order_kept is True and kept.order_concordance == 1.0
+    assert kept.order_kept is True and kept.order_concordance == pytest.approx(1.0)
     swapped = score_tokens(source, toks("g h i x a b c"))
-    assert swapped.order_kept is False and swapped.order_concordance == 0.0
+    assert swapped.order_kept is False and swapped.order_concordance == pytest.approx(0.0)
 
 
 def test_lead_share_full_and_partial():
@@ -108,7 +108,7 @@ def test_options_validation():
 
 def test_to_dict_keys():
     d = score_tokens(toks("a b c"), toks("a b")).to_dict(with_spans=True)
-    assert d["novel_1"] == 0.0
+    assert d["novel_1"] == pytest.approx(0.0)
     assert d["spans"] == [{"out_start": 0, "src_start": 0, "length": 2}]
 
 

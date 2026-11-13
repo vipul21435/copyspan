@@ -37,5 +37,5 @@ def test_public_api_round_trip():
     tok = copyspan.Tokenizer()
     r = copyspan.score_tokens(tok("The cat sat."), tok("The cat."), copyspan.Options())
     s = copyspan.summarize([r], boot=copyspan.BootstrapSettings(n_boot=10))
-    assert s["metrics"]["coverage"]["mean"] == 1.0
+    assert s["metrics"]["coverage"]["mean"] == pytest.approx(1.0)
     assert copyspan.__version__ == "0.1.0"

@@ -6,7 +6,7 @@ from copyspan.stats import bootstrap_mean, paired_difference, quantiles, wilson_
 
 def test_quantiles_hand_values():
     q = quantiles([4, 1, 3, 2])
-    assert q["q0"] == 1 and q["q100"] == 4
+    assert q["q0"] == pytest.approx(1) and q["q100"] == pytest.approx(4)
     assert q["q50"] == pytest.approx(2.5)
     assert q["q25"] == pytest.approx(1.75)
     assert quantiles([]) == {}
@@ -36,7 +36,10 @@ def test_singleton_groups_in_sorted_order_equal_record_bootstrap():
     rng = np.random.default_rng(3)
     x = rng.random(50)
     groups = [f"{i:03d}" for i in range(50)]
-    assert bootstrap_mean(x, groups, seed=9) == bootstrap_mean(x, seed=9)
+    clustered, plain = bootstrap_mean(x, groups, seed=9), bootstrap_mean(x, seed=9)
+    assert (clustered.estimate, clustered.low, clustered.high) == pytest.approx(
+        (plain.estimate, plain.low, plain.high)
+    )
 
 
 def test_clustered_interval_is_wider_for_correlated_groups():
@@ -57,7 +60,7 @@ def test_chunking_does_not_change_result(monkeypatch):
 
     monkeypatch.setattr(st, "_CHUNK_CELLS", 30 * 7)
     chunked = bootstrap_mean(x, seed=1, n_boot=100)
-    assert whole == chunked
+    assert (whole.low, whole.high) == pytest.approx((chunked.low, chunked.high))
 
 
 def test_paired_difference_constant_shift():

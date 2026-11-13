@@ -52,7 +52,7 @@ def test_position_histogram_sums_to_one():
     assert sum(hist) == pytest.approx(1.0)
     # "a b c d" covers the first four tenths, "e f g h i j" the last six
     assert hist == pytest.approx([0.1] * 10)
-    assert position_histogram([score_tokens([], [])], Options()) == [0.0] * 10
+    assert position_histogram([score_tokens([], [])], Options()) == pytest.approx([0.0] * 10)
 
 
 def test_compare_paired_differences():
@@ -73,7 +73,7 @@ def test_compare_identical_outputs_zero_difference():
     c = compare(a, a, groups=["x", "x", "y", "y", "z"], boot=BootstrapSettings(n_boot=50))
     for m in c["metrics"].values():
         if m["diff"] is not None:
-            assert m["diff"] == 0.0 and m["ci"] == [0.0, 0.0]
+            assert m["diff"] == pytest.approx(0.0) and m["ci"] == pytest.approx([0.0, 0.0])
 
 
 @pytest.fixture

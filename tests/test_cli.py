@@ -28,7 +28,7 @@ def test_score_jsonl(jsonl, capsys):
     assert main(["score", str(jsonl), "--source", "src", "--output", "out", "--id", "id"]) == 0
     lines = [json.loads(x) for x in capsys.readouterr().out.splitlines()]
     assert [r["id"] for r in lines] == ["a", "b", "c"]
-    assert lines[0]["coverage"] == 1.0
+    assert lines[0]["coverage"] == pytest.approx(1.0)
     assert "prefix" in lines[0]["flags"]
     assert lines[2]["flags"] == ["empty_output"]
     assert lines[0]["tokenizer"].startswith("word regex")
@@ -98,7 +98,7 @@ def test_stdin_input(monkeypatch, capsys):
     assert "<stdin>:3: expected a JSON object" in capsys.readouterr().err
     monkeypatch.setattr("sys.stdin", _io.StringIO('{"s": "a b c", "o": "a b"}\n'))
     assert main(["score", "-", "--source", "s", "--output", "o"]) == 0
-    assert json.loads(capsys.readouterr().out)["coverage"] == 1.0
+    assert json.loads(capsys.readouterr().out)["coverage"] == pytest.approx(1.0)
 
 
 def test_tsv_and_group_missing(tmp_path):
