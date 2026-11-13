@@ -204,7 +204,8 @@ The tails, as shares of records with a non-empty output:
 Coverage against density per record, from `copyspan score ... > SET.jsonl` on each sample and
 `uv run --with matplotlib python scripts/plot_coverage_density.py docs/coverage-density.png "CNN / Daily
 Mail=cnndm.jsonl" "XSum=xsum.jsonl" "Dolly with context=dolly.jsonl"` (records with density 0 are drawn at 0.05).
-The vertical band at coverage 1 in the Dolly panel holds the responses copied whole from their context.
+The vertical band at coverage 1 in the Dolly panel is the 29.8 % of responses made entirely of copied
+fragments.
 
 One Dolly response in eight that comes with a context is a verbatim span of it, against one CNN / Daily Mail
 highlight in a thousand. The first five XSum ids flagged `no_shared_content` are 39192648, 40108528, 38033551,
