@@ -73,11 +73,11 @@ Intervals: 95 % percentile bootstrap over records, 1000 resamples, seed 0.
 ```
 
 The report goes on with the remaining measures, the tails table, the position histogram and the flag counts. The
-other commands:
+other commands (the second line is a pattern for two files of your own, paired by id):
 
 ```
 copyspan compare examples/pairs.jsonl --source document --output summary --other draft --id id
-copyspan compare a.jsonl --source document --output summary --id id --other-file b.jsonl --other-output pred
+copyspan compare A.jsonl --source document --output summary --id id --other-file B.jsonl --other-output pred
 copyspan flag examples/pairs.jsonl --source document --output summary --id id
 ```
 
@@ -163,7 +163,8 @@ bootstrap interval (records, or groups, resampled together for both outputs), an
 ## Results on real public data
 
 All numbers below come from the commands shown, run here on seeded samples. `scripts/prepare_data.py` downloads the
-files and writes the samples outside the repository; no dataset rows are committed.
+files (about 60 MB) into the directory given as `--out` (DATA below) and writes the samples there; no dataset rows
+are committed.
 
 ```
 uv run --with pyarrow python scripts/prepare_data.py --out DATA      # 2,000 records per summarisation set, seed 0
