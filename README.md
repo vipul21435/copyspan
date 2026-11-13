@@ -148,8 +148,9 @@ in source order (both need two or more such fragments).
 
 **Flags.** `prefix` (the output is the start of the source), `slice` (the output is one contiguous span found
 elsewhere in the source), `no_shared_content` (no content word of the output occurs in the source, where a content
-word has a letter or digit and is not on a short English function-word list; an output made only of function words
-gets the flag too), `longer_than_source`, `empty_output`.
+word has a letter or digit and is not on a short English function-word list, compared after stripping surrounding
+punctuation and folding case; a contraction of a listed word, such as "it's" or "don't", is a function word; an
+output made only of function words gets the flag too), `longer_than_source`, `empty_output`.
 
 **Dataset summary.** For each measure: the number of records where it is defined, the mean, a 95 % percentile
 bootstrap interval over records (2,000 resamples, seed 0 by default) and quantiles (numpy's linear interpolation).

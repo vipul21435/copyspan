@@ -10,5 +10,7 @@ STOPWORDS = frozenset(
     that the their theirs them themselves then there these they this those through to too
     under until up very was we were what when where which while who whom why will with
     would you your yours yourself yourselves 's 't 'll 're 've 'd 'm
+    don't doesn't didn't isn't aren't wasn't weren't can't cannot couldn't won't wouldn't
+    shouldn't haven't hasn't hadn't
     """.split()
 )

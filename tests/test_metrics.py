@@ -132,3 +132,21 @@ def test_bounds_on_random_pairs():
                 assert 0.0 <= r.novel[n] <= 1.0
         if r.lead_share is not None:
             assert 0.0 <= r.lead_share <= 1.0 and 0.0 <= r.position_mean <= 1.0
+
+
+def test_content_words_handle_contractions_and_punctuation():
+    from copyspan.metrics import content_key
+    from copyspan.tokenize import Tokenizer
+
+    assert content_key("it's") is None
+    assert content_key("they\u2019re") is None
+    assert content_key("don't") is None
+    assert content_key("River,") == "river"
+    assert content_key("...") is None
+    ws = Tokenizer("whitespace", lower=False)
+    # only function words in the output: flagged
+    r = score_tokens(ws("The river is wide."), ws("It's what they're for."))
+    assert "no_shared_content" in r.flags
+    # "River," and "river" share a content word under the whitespace tokeniser
+    r = score_tokens(ws("the river is wide"), ws("A River, then."))
+    assert "no_shared_content" not in r.flags

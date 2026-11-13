@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import string
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
@@ -9,6 +10,7 @@ from copyspan.fragments import Fragment, fragments_newsroom, greedy_walk, longes
 from copyspan.stopwords import STOPWORDS
 
 NGRAM_ORDERS = (1, 2, 3, 4)
+_PUNCT = string.punctuation + "\u2018\u2019\u201c\u201d"
 ALGORITHMS = ("exact", "newsroom")
 
 
@@ -102,8 +104,23 @@ def novel_ngram_share(source: Sequence[str], output: Sequence[str], n: int) -> f
     return sum(1 for g in out if g not in src) / len(out)
 
 
+def content_key(token: str) -> str | None:
+    """The comparison key of a content word, or ``None`` for a function word or punctuation.
+
+    Surrounding punctuation is stripped and case folded, so "River," and "river"
+    share a key. A contraction counts as a function word when the whole token
+    ("don't") or the part before its apostrophe ("it" in "it's") is on the list.
+    """
+    word = token.casefold().replace("\u2019", "'").strip(_PUNCT)
+    if not any(ch.isalnum() for ch in word):
+        return None
+    if word in STOPWORDS or word.split("'", 1)[0] in STOPWORDS:
+        return None
+    return word
+
+
 def is_content_word(token: str) -> bool:
-    return any(ch.isalnum() for ch in token) and token.casefold() not in STOPWORDS
+    return content_key(token) is not None
 
 
 def score_tokens(
@@ -156,8 +173,8 @@ def score_tokens(
     else:
         if n_src and longest == n_out:
             flags.append("prefix" if list(source[:n_out]) == list(output) else "slice")
-        out_content = {t for t in output if is_content_word(t)}
-        src_content = {t for t in source if is_content_word(t)}
+        out_content = {k for k in map(content_key, output) if k is not None}
+        src_content = {k for k in map(content_key, source) if k is not None}
         if not out_content & src_content:
             flags.append("no_shared_content")
         if n_out > n_src:
