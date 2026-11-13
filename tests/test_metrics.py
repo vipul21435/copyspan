@@ -110,3 +110,25 @@ def test_to_dict_keys():
     d = score_tokens(toks("a b c"), toks("a b")).to_dict(with_spans=True)
     assert d["novel_1"] == 0.0
     assert d["spans"] == [{"out_start": 0, "src_start": 0, "length": 2}]
+
+
+def test_bounds_on_random_pairs():
+    import random
+
+    rng = random.Random(21)
+    for _ in range(1000):
+        vocab = [str(k) for k in range(rng.randint(1, 5))]
+        source = [rng.choice(vocab) for _ in range(rng.randint(0, 30))]
+        output = [rng.choice(vocab + ["new"]) for _ in range(rng.randint(1, 20))]
+        r = score_tokens(source, output)
+        longest_fragment = max((f.length for f in r.spans), default=0)
+        assert 0.0 <= r.coverage <= 1.0
+        assert r.coverage <= r.density + 1e-12
+        assert r.density <= r.coverage * longest_fragment + 1e-12
+        assert longest_fragment <= r.longest_span
+        assert r.novel[1] == pytest.approx(1 - r.coverage)
+        for n in (2, 3, 4):
+            if r.novel[n] is not None:
+                assert 0.0 <= r.novel[n] <= 1.0
+        if r.lead_share is not None:
+            assert 0.0 <= r.lead_share <= 1.0 and 0.0 <= r.position_mean <= 1.0
