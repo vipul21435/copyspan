@@ -139,7 +139,8 @@ def longest_matches(source: Sequence[str], output: Sequence[str]) -> tuple[list[
     return lengths, starts
 
 
-def _greedy(lengths: list[int], starts: list[int]) -> list[Fragment]:
+def greedy_walk(lengths: Sequence[int], starts: Sequence[int]) -> list[Fragment]:
+    """Read the greedy fragments off the arrays returned by :func:`longest_matches`."""
     out: list[Fragment] = []
     i = 0
     m = len(lengths)
@@ -155,7 +156,7 @@ def _greedy(lengths: list[int], starts: list[int]) -> list[Fragment]:
 
 def fragments(source: Sequence[str], output: Sequence[str]) -> list[Fragment]:
     """Greedy extractive fragments of ``output`` with respect to ``source`` (linear time)."""
-    return _greedy(*longest_matches(source, output))
+    return greedy_walk(*longest_matches(source, output))
 
 
 def fragments_bruteforce(source: Sequence[str], output: Sequence[str]) -> list[Fragment]:

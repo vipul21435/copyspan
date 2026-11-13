@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
-from copyspan.fragments import Fragment, fragments, fragments_newsroom, longest_matches
+from copyspan.fragments import Fragment, fragments_newsroom, greedy_walk, longest_matches
 from copyspan.stopwords import STOPWORDS
 
 NGRAM_ORDERS = (1, 2, 3, 4)
@@ -113,8 +113,10 @@ def score_tokens(
     opt = options or Options()
     n_src, n_out = len(source), len(output)
     lengths, starts = longest_matches(source, output)
-    finder = fragments if opt.algorithm == "exact" else fragments_newsroom
-    frags = finder(source, output) if n_out and n_src else []
+    if opt.algorithm == "exact":
+        frags = greedy_walk(lengths, starts)
+    else:
+        frags = fragments_newsroom(source, output)
     copied = sum(f.length for f in frags)
 
     if n_out:

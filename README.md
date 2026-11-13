@@ -243,7 +243,8 @@ search 1.36 ms, with identical fragments for all 300. On the first 30 sources jo
 30 highlights joined (1,197 tokens) it is 28 ms against 1,196 ms; the same joined case on Dolly (6,023-token
 source, 3,916-token output) is 6 ms against 1,317 ms. The direct search stays cheap on short summaries because the
 greedy walk only searches at fragment starts; its cost grows with the number of fragments times the source length.
-The whole `summary` run on the 2,000 CNN / Daily Mail records, bootstrap included, took 4.5 s.
+The whole `summary` run on the 2,000 CNN / Daily Mail records, bootstrap included, took 15 to 17 s of wall
+time (about 9 s of CPU) while the laptop's load average was near 30.
 
 ## Limitations
 
