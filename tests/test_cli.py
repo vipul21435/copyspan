@@ -132,3 +132,17 @@ def test_csv_with_byte_order_mark(tmp_path):
     q = tmp_path / "bom.jsonl"
     q.write_bytes('\ufeff{"id": "k2", "src": "a", "out": "a"}\n'.encode())
     assert read_records(q, "src", "out", "id")[0].id == "k2"
+
+
+@pytest.mark.parametrize("value", ["NaN", "true", "1.5", '{"a": 1}', '["a", false]'])
+def test_non_text_values_raise(tmp_path, value):
+    p = tmp_path / "v.jsonl"
+    p.write_text('{"s": "a b", "o": ' + value + "}\n")
+    with pytest.raises(ValueError, match="row 0 field 'o': expected text"):
+        read_records(p, "s", "o")
+
+
+def test_integer_value_is_read_as_digits(tmp_path):
+    p = tmp_path / "i.jsonl"
+    p.write_text('{"s": "it was 42", "o": 42}\n')
+    assert read_records(p, "s", "o")[0].output == "42"

@@ -46,14 +46,18 @@ def _rows(path: str | Path) -> Iterator[dict]:
         yield from _json_lines(fh, p)
 
 
-def _text(value: object) -> str:
+def _text(value: object, where: str) -> str:
+    """Text of a field: a string, a list of strings (joined with newlines), an
+    integer, or null (empty). Anything else raises ``ValueError``."""
     if value is None:
         return ""
     if isinstance(value, str):
         return value
+    if isinstance(value, int) and not isinstance(value, bool):
+        return str(value)
     if isinstance(value, list):
-        return "\n".join(_text(v) for v in value)
-    return str(value)
+        return "\n".join(_text(v, where) for v in value)
+    raise ValueError(f"{where}: expected text, got {type(value).__name__} {value!r:.40}")
 
 
 def read_records(
@@ -65,7 +69,8 @@ def read_records(
 ) -> list[Record]:
     """Load records. Rows missing the source, output or a named id field raise ``ValueError``.
 
-    A list value (for example a list of sentences) is joined with newlines.
+    A list value (for example a list of sentences) is joined with newlines; an
+    integer is read as its digits; a float, boolean or object raises ``ValueError``.
     Without ``id_field`` the id is the 0-based row number. With ``source_field``
     set to ``None`` only the output is read (the source is left empty).
     """
@@ -85,6 +90,8 @@ def read_records(
             if row.get(group_field) is None:
                 raise ValueError(f"row {k}: group field {group_field!r} missing")
             grp = str(row[group_field])
-        src = _text(row[source_field]) if source_field is not None else ""
-        out.append(Record(rid, src, _text(row[output_field]), grp))
+        src = _text(row[source_field], f"row {k} field {source_field!r}") if source_field else ""
+        out.append(
+            Record(rid, src, _text(row[output_field], f"row {k} field {output_field!r}"), grp)
+        )
     return out
